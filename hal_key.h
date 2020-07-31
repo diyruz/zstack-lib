@@ -70,6 +70,10 @@ extern "C"
 #define HAL_KEY_INTERRUPT_DISABLE    0x00
 #define HAL_KEY_INTERRUPT_ENABLE     0x01
 
+/* Key state - shift or nornal */
+#define HAL_KEY_STATE_NORMAL          0x00
+#define HAL_KEY_STATE_SHIFT           0x01
+
 #define HAL_KEY_RISING_EDGE 0
 #define HAL_KEY_FALLING_EDGE 1
 
