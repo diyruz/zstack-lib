@@ -51,7 +51,7 @@ void LREP(char *format, ...) {
     vprint(format, argp);
     va_end(argp);
 }
-#else
+#elif defined(DO_DEBUG_MT)
 
 bool DebugInit() {
     debugThreshold = 0x04; // increase threshold as soon as we initialize debug module
@@ -66,4 +66,8 @@ void LREP(char *format, ...) {
     va_end(argp);
 }
 void LREPMaster(uint8 *data) { debug_str(data); }
+#else
+bool DebugInit() {return true;};
+void LREP(char *format, ...) {};
+void LREPMaster(uint8 *data) {};
 #endif
