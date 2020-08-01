@@ -6,6 +6,7 @@
 #include "bdb_interface.h"
 #include "hal_led.h"
 #include "ZComDef.h"
+#include "hal_key.h"
 
 static void zclFactoryResetter_ResetToFN(void);
 static void zclFactoryResetter_ProcessBootCounter(void);
@@ -38,7 +39,7 @@ void zclFactoryResetter_Init(uint8 task_id) {
     zclFactoryResetter_TaskID = task_id;
     /**
      * We can't register more than one task, call in main app taks
-     * zclFactoryResetter_HandleKeys(shift, keyCode);
+     * zclFactoryResetter_HandleKeys(portAndAction, keyCode);
      * */
     // RegisterForKeys(task_id);
 #if FACTORY_RESET_BY_BOOT_COUNTER
@@ -47,15 +48,15 @@ void zclFactoryResetter_Init(uint8 task_id) {
 }
 
 void zclFactoryResetter_ResetToFN(void) {
-    HalLedSet(HAL_LED_1, HAL_LED_MODE_FLASH);
+    HalLedSet(HAL_LED_1, HAL_LED_MODE_BLINK);
     LREP("bdbAttributes.bdbNodeIsOnANetwork=%d bdbAttributes.bdbCommissioningMode=0x%X\r\n", bdbAttributes.bdbNodeIsOnANetwork, bdbAttributes.bdbCommissioningMode);
     LREPMaster("zclFactoryResetter: Reset to FN\r\n");
     bdb_resetLocalAction();
 }
 
-void zclFactoryResetter_HandleKeys(uint8 shift, uint8 keyCode) {
+void zclFactoryResetter_HandleKeys(uint8 portAndAction, uint8 keyCode) {
 #if FACTORY_RESET_BY_LONG_PRESS
-    if (keyCode == HAL_KEY_CODE_NOKEY) {
+    if (portAndAction & HAL_KEY_RELEASE) {
         LREPMaster("zclFactoryResetter: Key release\r\n");
         osal_stop_timerEx(zclFactoryResetter_TaskID, FACTORY_RESET_EVT);
     } else {

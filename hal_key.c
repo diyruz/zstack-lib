@@ -22,32 +22,14 @@
  *                                            CONSTANTS
  **************************************************************************************************/
 
+uint8 portNum = 0;
+uint8 pinNum = 0;
 
-
-
+#define HAL_KEY_DEBOUNCE_VALUE 25
 
 #define HAL_KEY_P0_EDGE_BITS HAL_KEY_BIT0
 #define HAL_KEY_P1_EDGE_BITS (HAL_KEY_BIT1 | HAL_KEY_BIT2)
 #define HAL_KEY_P2_EDGE_BITS HAL_KEY_BIT3
-
-
-
-#if defined(HAL_BOARD_FLOWER)
-#define HAL_KEY_P0_INPUT_PINS 0x00
-#define HAL_KEY_P1_INPUT_PINS 0x00
-#define HAL_KEY_P2_INPUT_PINS (HAL_KEY_BIT0)
-
-#elif defined(HAL_BOARD_CHDTECH_DEV)
-#define HAL_KEY_P0_INPUT_PINS (HAL_KEY_BIT1 | HAL_KEY_BIT6)
-#define HAL_KEY_P0_INPUT_PINS_EDGE HAL_KEY_FALLING_EDGE
-
-#define HAL_KEY_P1_INPUT_PINS 0x00
-#define HAL_KEY_P1_INPUT_PINS_EDGE HAL_KEY_FALLING_EDGE
-
-#define HAL_KEY_P2_INPUT_PINS (HAL_KEY_BIT0)
-#define HAL_KEY_P2_INPUT_PINS_EDGE HAL_KEY_FALLING_EDGE
-
-#endif
 
 /**************************************************************************************************
  *                                            TYPEDEFS
@@ -63,7 +45,37 @@ bool Hal_KeyIntEnable;
  **************************************************************************************************/
 void halProcessKeyInterrupt(uint8 portNum);
 
-void HalKeyPoll(void) {}
+void HalKeyPoll(void) {
+    uint8 pinStatus = 0;
+    bool isPressed = false;
+    switch (portNum) {
+    case HAL_KEY_PORT0:
+        PICTL ^= HAL_KEY_P0_EDGE_BITS; // flip edge bit
+        pinStatus = P0 & pinNum;
+        isPressed = HAL_KEY_P0_INPUT_PINS_EDGE != !!(pinStatus);
+        break;
+
+    case HAL_KEY_PORT1:
+        PICTL ^= HAL_KEY_P1_EDGE_BITS; // flip edge bit
+        pinStatus = P1 & pinNum;
+        isPressed = HAL_KEY_P1_INPUT_PINS_EDGE != !!(pinStatus);
+        break;
+
+    case HAL_KEY_PORT2:
+        PICTL ^= HAL_KEY_P2_EDGE_BITS; // flip edge bit
+        pinStatus = P2 & pinNum;
+        isPressed = HAL_KEY_P2_INPUT_PINS_EDGE != !!(pinStatus);
+        break;
+
+    default:
+        break;
+    }
+    LREP("portNum=0x%X pinNum=0x%X isPressed=%d\r\n", portNum, pinNum, isPressed);
+
+    // LREP("pinStatus=" BYTE_TO_BINARY_PATTERN "\r\n", BYTE_TO_BINARY(pinStatus));
+    OnBoard_SendKeys(pinNum, (isPressed ? HAL_KEY_PRESS : HAL_KEY_RELEASE) | portNum);
+}
+
 void HalKeyInit(void) {
 #if HAL_KEY_P0_INPUT_PINS
     P0SEL &= ~HAL_KEY_P0_INPUT_PINS;
@@ -85,7 +97,7 @@ void HalKeyInit(void) {
 
 void HalKeyConfig(bool interruptEnable, halKeyCBack_t cback) {
     Hal_KeyIntEnable = true;
-    pHalKeyProcessFunction = cback;
+
 #if HAL_KEY_P0_INPUT_PINS
     P0IEN |= HAL_KEY_P0_INPUT_PINS;
     IEN1 |= HAL_KEY_BIT5;            // enable port0 int
@@ -106,10 +118,13 @@ void HalKeyConfig(bool interruptEnable, halKeyCBack_t cback) {
 #if HAL_KEY_P1_INPUT_PINS
     P1IEN |= HAL_KEY_P1_INPUT_PINS;
     IEN2 |= HAL_KEY_BIT4; // enable port1 int
+    P1INP &= ~HAL_KEY_P1_INPUT_PINS; //Pullup/pulldown 
 #if (HAL_KEY_P1_INPUT_PINS_EDGE == HAL_KEY_FALLING_EDGE)
+    P2INP &= ~HAL_KEY_BIT6;        // pull up
     PICTL |= HAL_KEY_P1_EDGE_BITS; // set falling edge on port
 #else
     PICTL &= ~HAL_KEY_P1_EDGE_BITS;
+    P2INP |= HAL_KEY_BIT6; // pull down
 #endif
 
 #endif
@@ -117,50 +132,38 @@ void HalKeyConfig(bool interruptEnable, halKeyCBack_t cback) {
 #if HAL_KEY_P2_INPUT_PINS
     P2IEN |= HAL_KEY_P2_INPUT_PINS;
     IEN2 |= HAL_KEY_BIT1; // enable port2 int
+    P2INP &= ~HAL_KEY_P2_INPUT_PINS; //Pullup/pulldown
 #if (HAL_KEY_P2_INPUT_PINS_EDGE == HAL_KEY_FALLING_EDGE)
+    P2INP &= ~HAL_KEY_BIT7;        // pull up
     PICTL |= HAL_KEY_P2_EDGE_BITS; // set falling edge on port
 #else
     PICTL &= ~HAL_KEY_P2_EDGE_BITS;
+    P2INP |= HAL_KEY_BIT7; // pull down
 #endif
 
 #endif
 }
 
-void halProcessKeyInterrupt(uint8 portNum) {
+void halProcessKeyInterrupt(uint8 _portNum) {
     uint8 pressedPin = 0;
     bool isPressed = false;
-    Onboard_wait(50);
-    switch (portNum) {
+    portNum = _portNum;
+    switch (_portNum) {
     case HAL_KEY_PORT0:
-        pressedPin = P0IFG & HAL_KEY_P0_INPUT_PINS;
-        isPressed = HAL_KEY_P0_INPUT_PINS_EDGE != !!(P0 & HAL_KEY_P0_INPUT_PINS & pressedPin);
-        PICTL ^= HAL_KEY_P0_EDGE_BITS; // flip edge bit
+        pinNum = P0IFG & HAL_KEY_P0_INPUT_PINS;
         break;
 
     case HAL_KEY_PORT1:
-        pressedPin = P1IFG & HAL_KEY_P1_INPUT_PINS;
-        isPressed = HAL_KEY_P1_INPUT_PINS_EDGE != !!(P1 & HAL_KEY_P1_INPUT_PINS & pressedPin);
-        PICTL ^= HAL_KEY_P1_EDGE_BITS; // flip edge bit
+        pinNum = P1IFG & HAL_KEY_P1_INPUT_PINS;
         break;
 
     case HAL_KEY_PORT2:
-        pressedPin = P2IFG & HAL_KEY_P2_INPUT_PINS;
-        isPressed = HAL_KEY_P2_INPUT_PINS_EDGE != !!(P2 & HAL_KEY_P2_INPUT_PINS & pressedPin);
-        PICTL ^= HAL_KEY_P2_EDGE_BITS; // flip edge bit
+        pinNum = P2IFG & HAL_KEY_P2_INPUT_PINS;
         break;
     default:
         break;
     }
-
-    LREP("portNum=0x%X pressedPin=0x%X isPressed=%d\r\n", portNum, pressedPin, isPressed);
-    LREP("pin=" BYTE_TO_BINARY_PATTERN "\r\n", BYTE_TO_BINARY(pressedPin));
-    LREP("P0=" BYTE_TO_BINARY_PATTERN "\r\n", BYTE_TO_BINARY(P0));
-    LREP("P1=" BYTE_TO_BINARY_PATTERN "\r\n", BYTE_TO_BINARY(P1));
-    LREP("P2=" BYTE_TO_BINARY_PATTERN "\r\n", BYTE_TO_BINARY(P2));
-
-    if (pHalKeyProcessFunction) {
-        (pHalKeyProcessFunction)(pressedPin, portNum | isPressed);
-    }
+    osal_start_timerEx(Hal_TaskID, HAL_KEY_EVENT, HAL_KEY_DEBOUNCE_VALUE);
 }
 
 void HalKeyEnterSleep(void) {
@@ -199,7 +202,7 @@ HAL_ISR_FUNCTION(halKeyPort0Isr, P0INT_VECTOR) {
         halProcessKeyInterrupt(HAL_KEY_PORT0);
     }
 
-    P0IFG &= ~HAL_KEY_P0_INPUT_PINS;
+    P0IFG = 0; //&= ~HAL_KEY_P0_INPUT_PINS;
     P0IF = 0;
 
     CLEAR_SLEEP_MODE();
@@ -215,7 +218,7 @@ HAL_ISR_FUNCTION(halKeyPort1Isr, P1INT_VECTOR) {
         halProcessKeyInterrupt(HAL_KEY_PORT1);
     }
 
-    P1IFG &= ~HAL_KEY_P1_INPUT_PINS;
+    P1IFG = 0; //&= ~HAL_KEY_P1_INPUT_PINS;
     P1IF = 0;
 
     CLEAR_SLEEP_MODE();
@@ -231,10 +234,14 @@ HAL_ISR_FUNCTION(halKeyPort2Isr, P2INT_VECTOR) {
         halProcessKeyInterrupt(HAL_KEY_PORT2);
     }
 
-    P2IFG &= ~HAL_KEY_P2_INPUT_PINS;
+    P2IFG = 0; //&= ~HAL_KEY_P2_INPUT_PINS;
     P2IF = 0;
 
     CLEAR_SLEEP_MODE();
     HAL_EXIT_ISR();
 }
 #endif
+
+
+
+uint8 HalKeyRead ( void ){}

@@ -66,6 +66,33 @@ extern "C"
 #define HAL_KEY_BIT6   0x40
 #define HAL_KEY_BIT7   0x80
 
+
+
+#ifndef HAL_KEY_P0_INPUT_PINS
+  #define HAL_KEY_P0_INPUT_PINS 0x00
+#endif
+
+#ifndef HAL_KEY_P1_INPUT_PINS
+  #define HAL_KEY_P1_INPUT_PINS 0x00
+#endif
+
+#ifndef HAL_KEY_P2_INPUT_PINS
+  #define HAL_KEY_P2_INPUT_PINS 0x00
+#endif
+
+
+#ifndef HAL_KEY_P0_INPUT_PINS_EDGE
+  #define HAL_KEY_P0_INPUT_PINS_EDGE HAL_KEY_FALLING_EDGE
+#endif
+
+#ifndef HAL_KEY_P1_INPUT_PINS_EDGE
+  #define HAL_KEY_P1_INPUT_PINS_EDGE HAL_KEY_FALLING_EDGE
+#endif
+
+#ifndef HAL_KEY_P2_INPUT_PINS_EDGE
+  #define HAL_KEY_P2_INPUT_PINS_EDGE HAL_KEY_FALLING_EDGE
+#endif
+
 /* Interrupt option - Enable or disable */
 #define HAL_KEY_INTERRUPT_DISABLE    0x00
 #define HAL_KEY_INTERRUPT_ENABLE     0x01
@@ -77,12 +104,15 @@ extern "C"
 #define HAL_KEY_RISING_EDGE 0
 #define HAL_KEY_FALLING_EDGE 1
 
-#define HAL_KEY_PRESS 0x00
-#define HAL_KEY_RELEASE 0x10
 
-#define HAL_KEY_PORT0 0x00
-#define HAL_KEY_PORT1 0x10
-#define HAL_KEY_PORT2 0x20
+
+#define HAL_KEY_PORT0 0x01
+#define HAL_KEY_PORT1 0x02
+#define HAL_KEY_PORT2 0x04
+
+#define HAL_KEY_PRESS 0x20
+#define HAL_KEY_RELEASE 0x40
+
 
 
 #define HAL_KEY_SW_1 0x01  // Joystick up
