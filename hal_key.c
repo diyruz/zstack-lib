@@ -38,7 +38,6 @@ uint8 pinNum = 0;
 /**************************************************************************************************
  *                                        GLOBAL VARIABLES
  **************************************************************************************************/
-static halKeyCBack_t pHalKeyProcessFunction;
 bool Hal_KeyIntEnable;
 /**************************************************************************************************
  *                                        FUNCTIONS - Local
@@ -92,7 +91,6 @@ void HalKeyInit(void) {
     P2DIR &= ~(HAL_KEY_P2_INPUT_PINS);
 #endif
 
-    pHalKeyProcessFunction = NULL;
 }
 
 void HalKeyConfig(bool interruptEnable, halKeyCBack_t cback) {
@@ -145,8 +143,6 @@ void HalKeyConfig(bool interruptEnable, halKeyCBack_t cback) {
 }
 
 void halProcessKeyInterrupt(uint8 _portNum) {
-    uint8 pressedPin = 0;
-    bool isPressed = false;
     portNum = _portNum;
     switch (_portNum) {
     case HAL_KEY_PORT0:
@@ -244,4 +240,6 @@ HAL_ISR_FUNCTION(halKeyPort2Isr, P2INT_VECTOR) {
 
 
 
-uint8 HalKeyRead ( void ){}
+uint8 HalKeyRead ( void ){
+    return 0;
+}
