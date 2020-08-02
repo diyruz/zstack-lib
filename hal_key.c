@@ -18,6 +18,30 @@
  *                                              MACROS
  **************************************************************************************************/
 
+#ifndef HAL_KEY_P0_INPUT_PINS
+  #define HAL_KEY_P0_INPUT_PINS 0x00
+#endif
+
+#ifndef HAL_KEY_P1_INPUT_PINS
+  #define HAL_KEY_P1_INPUT_PINS 0x00
+#endif
+
+#ifndef HAL_KEY_P2_INPUT_PINS
+  #define HAL_KEY_P2_INPUT_PINS 0x00
+#endif
+
+
+#ifndef HAL_KEY_P0_INPUT_PINS_EDGE
+  #define HAL_KEY_P0_INPUT_PINS_EDGE HAL_KEY_FALLING_EDGE
+#endif
+
+#ifndef HAL_KEY_P1_INPUT_PINS_EDGE
+  #define HAL_KEY_P1_INPUT_PINS_EDGE HAL_KEY_FALLING_EDGE
+#endif
+
+#ifndef HAL_KEY_P2_INPUT_PINS_EDGE
+  #define HAL_KEY_P2_INPUT_PINS_EDGE HAL_KEY_FALLING_EDGE
+#endif
 /**************************************************************************************************
  *                                            CONSTANTS
  **************************************************************************************************/

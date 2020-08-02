@@ -180,4 +180,7 @@ void zclCommissioning_HandleKeys(uint8 portAndAction, uint8 keyCode) {
             bdb_ZedAttemptRecoverNwk();
         }
     }
+    #if defined(POWER_SAVING)
+        NLME_SetPollRate(1);
+    #endif
 }
