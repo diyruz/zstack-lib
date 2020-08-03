@@ -151,7 +151,9 @@ uint16 zclCommissioning_event_loop(uint8 task_id, uint16 events) {
     }
     if (events & APP_COMMISSIONING_END_DEVICE_REJOIN_EVT) {
         LREPMaster("APP_END_DEVICE_REJOIN_EVT\r\n");
+#if ZG_BUILD_ENDDEVICE_TYPE
         bdb_ZedAttemptRecoverNwk();
+#endif
         return (events ^ APP_COMMISSIONING_END_DEVICE_REJOIN_EVT);
     }
 
@@ -175,9 +177,11 @@ static void zclCommissioning_BindNotification(bdbBindNotificationData_t *data) {
 
 void zclCommissioning_HandleKeys(uint8 portAndAction, uint8 keyCode) {
     if (portAndAction & HAL_KEY_PRESS) {
+#if ZG_BUILD_ENDDEVICE_TYPE
         if (devState == DEV_NWK_ORPHAN) {
             LREP("devState=%d try to restore network\r\n", devState);
             bdb_ZedAttemptRecoverNwk();
         }
+#endif
     }
 }
