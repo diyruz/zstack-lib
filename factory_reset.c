@@ -48,7 +48,7 @@ void zclFactoryResetter_Init(uint8 task_id) {
 }
 
 void zclFactoryResetter_ResetToFN(void) {
-    HalLedSet(HAL_LED_1, HAL_LED_MODE_BLINK);
+    HalLedSet(HAL_LED_1, HAL_LED_MODE_FLASH);
     LREP("bdbAttributes.bdbNodeIsOnANetwork=%d bdbAttributes.bdbCommissioningMode=0x%X\r\n", bdbAttributes.bdbNodeIsOnANetwork, bdbAttributes.bdbCommissioningMode);
     LREPMaster("zclFactoryResetter: Reset to FN\r\n");
     bdb_resetLocalAction();
