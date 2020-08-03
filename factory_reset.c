@@ -61,8 +61,15 @@ void zclFactoryResetter_HandleKeys(uint8 portAndAction, uint8 keyCode) {
         osal_stop_timerEx(zclFactoryResetter_TaskID, FACTORY_RESET_EVT);
     } else {
         LREPMaster("zclFactoryResetter: Key press\r\n");
-        osal_start_timerEx(zclFactoryResetter_TaskID, FACTORY_RESET_EVT,
-                           bdbAttributes.bdbNodeIsOnANetwork ? FACTORY_RESET_HOLD_TIME_LONG : FACTORY_RESET_HOLD_TIME_FAST);
+        bool statTimer = true;
+#if FACTORY_RESET_BY_LONG_PRESS_PORT
+        statTimer = FACTORY_RESET_BY_LONG_PRESS_PORT & portAndAction;
+#endif
+        LREP("zclFactoryResetter statTimer hold timer %d\r\n", statTimer);
+        if (statTimer) {
+            uint32 timeout = bdbAttributes.bdbNodeIsOnANetwork ? FACTORY_RESET_HOLD_TIME_LONG : FACTORY_RESET_HOLD_TIME_FAST;
+            osal_start_timerEx(zclFactoryResetter_TaskID, FACTORY_RESET_EVT, timeout);
+        }
     }
 #endif
 }
