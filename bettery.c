@@ -31,10 +31,10 @@
 
 #define ZCL_BATTERY_REPORT_EVT 0x0001
 
-static void zclBatterh_Report(void);
 
 uint8 zclBattery_Voltage = 0xff;
 uint8 zclBattery_PercentageRemainig = 0xff;
+uint16 zclBattery_RawAdc = 0xff;
 
 uint8 getBatteryVoltageZCL(uint16 millivolts) {
     uint8 volt8 = (uint8)(millivolts / 100);
@@ -47,8 +47,8 @@ uint8 getBatteryVoltageZCL(uint16 millivolts) {
 // return millivolts
 uint16 getBatteryVoltage(void) {
     HalAdcSetReference(HAL_ADC_REF_125V);
-    double rawADC = adcReadSampled(HAL_ADC_CHANNEL_VDD, HAL_ADC_RESOLUTION_14, HAL_ADC_REF_125V, 10);
-    return (uint16)(rawADC * MULTI);
+    zclBattery_RawAdc = adcReadSampled(HAL_ADC_CHANNEL_VDD, HAL_ADC_RESOLUTION_14, HAL_ADC_REF_125V, 10);
+    return (uint16)(zclBattery_RawAdc * MULTI);
 }
 
 uint8 getBatteryRemainingPercentageZCL(uint16 millivolts) { return (uint8)mapRange(VOLTAGE_MIN, VOLTAGE_MAX, 0.0, 200.0, millivolts); }
@@ -71,7 +71,7 @@ uint8 getBatteryRemainingPercentageZCLCR2032(uint16 volt16) {
     return (uint8)(battery_level * 2);
 }
 
-static void zclBatterh_Report(void) {
+void zclBattery_Report(void) {
     uint16 millivolts = getBatteryVoltage();
     zclBattery_Voltage = getBatteryVoltageZCL(millivolts);
     zclBattery_PercentageRemainig = ZCL_BATTERY_REPORT_REPORT_CONVERTER(millivolts);
@@ -81,7 +81,7 @@ static void zclBatterh_Report(void) {
 #if BDB_REPORTING
     bdb_RepChangedAttrValue(1, POWER_CFG, ATTRID_POWER_CFG_BATTERY_PERCENTAGE_REMAINING);
 #else
-    const uint8 NUM_ATTRIBUTES = 2;
+    const uint8 NUM_ATTRIBUTES = 3;
     zclReportCmd_t *pReportCmd;
     pReportCmd = osal_mem_alloc(sizeof(zclReportCmd_t) + (NUM_ATTRIBUTES * sizeof(zclReport_t)));
     if (pReportCmd != NULL) {
@@ -94,6 +94,11 @@ static void zclBatterh_Report(void) {
         pReportCmd->attrList[1].attrID = ATTRID_POWER_CFG_BATTERY_PERCENTAGE_REMAINING;
         pReportCmd->attrList[1].dataType = ZCL_DATATYPE_UINT8;
         pReportCmd->attrList[1].attrData = (void *)(&zclBattery_PercentageRemainig);
+
+        pReportCmd->attrList[2].attrID = ATTRID_POWER_CFG_BATTERY_VOLTAGE_RAW_ADC;
+        pReportCmd->attrList[2].dataType = ZCL_DATATYPE_UINT16;
+        pReportCmd->attrList[2].attrData = (void *)(&zclBattery_RawAdc);
+
         afAddrType_t inderect_DstAddr = {.addrMode = (afAddrMode_t)AddrNotPresent, .endPoint = 0, .addr.shortAddr = 0};
         zcl_SendReportCmd(1, &inderect_DstAddr, POWER_CFG, pReportCmd, ZCL_FRAME_CLIENT_SERVER_DIR, TRUE, bdb_getZCLFrameCounter());
     }
@@ -114,7 +119,7 @@ uint16 zclBattery_event_loop(uint8 task_id, uint16 events) {
     LREP("zclBattery_event_loop 0x%X\r\n", events);
     if (events & ZCL_BATTERY_REPORT_EVT) {
         LREPMaster("ZCL_BATTERY_REPORT_EVT\r\n");
-        zclBatterh_Report();
+        zclBattery_Report();
         return (events ^ ZCL_BATTERY_REPORT_EVT);
     }
     return 0;
