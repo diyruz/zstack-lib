@@ -16,7 +16,7 @@
 #define VOLTAGE_MAX 3.3
 
 #ifndef ZCL_BATTERY_REPORT_INTERVAL
-    #define ZCL_BATTERY_REPORT_INTERVAL ((uint32) (30 *  60 * 1000)) //30 minutea
+    #define ZCL_BATTERY_REPORT_INTERVAL ((uint32) 1800000) //30 minutes
 #endif
 
 #ifndef ZCL_BATTERY_REPORT_DELAY
