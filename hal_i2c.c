@@ -115,13 +115,6 @@ STATIC void hali2cSendDeviceAddress(uint8 address);
 
 STATIC __near_func void hali2cWait(uint8);
 
-static void hali2cGroudPins(void);
-
-void hali2cGroudPins(void) {
-    IO_DIR_PORT_PIN(OCM_DATA_PORT, OCM_DATA_PIN, IO_IN);
-    IO_DIR_PORT_PIN(OCM_CLK_PORT, OCM_CLK_PIN, IO_IN);
-}
-
 STATIC uint8 s_xmemIsInit;
 
 /*********************************************************************
@@ -322,8 +315,6 @@ STATIC void hali2cStop(void) {
     hali2cClock(1);
     OCM_DATA_HIGH(); // stop condition
     hali2cWait(1);
-
-    hali2cGroudPins();
 }
 
 /*********************************************************************
