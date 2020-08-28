@@ -3,6 +3,7 @@
 #include "OSAL.h"
 #include "OnBoard.h"
 #include "hal_uart.h"
+#include "hal_led.h"
 
 #ifndef SENSEAIR_UART_PORT
     #define SENSEAIR_UART_PORT HAL_UART_PORT_1
@@ -30,8 +31,8 @@ void zclApp_SenseAirInit(void) {
     halUARTConfig.flowControlThreshold = 48; // this parameter indicates number of bytes left before Rx Buffer
                                              // reaches maxRxBufSize
     halUARTConfig.idleTimeout = 10;          // this parameter indicates rx timeout period in millisecond
-    halUARTConfig.rx.maxBufSize = SENSEAIR_RESPONSE_LENGTH;
-    halUARTConfig.tx.maxBufSize = 10;
+    halUARTConfig.rx.maxBufSize = 20;
+    halUARTConfig.tx.maxBufSize = 20;
     halUARTConfig.intEnable = TRUE;
     HalUARTInit();
     if (HalUARTOpen(SENSEAIR_UART_PORT, &halUARTConfig) == HAL_UART_SUCCESS) {
@@ -40,7 +41,7 @@ void zclApp_SenseAirInit(void) {
 }
 void zclApp_SenseAirRequestMeasure(void) {
     uint8 response[SENSEAIR_RESPONSE_LENGTH];
-    if (Hal_UART_RxBufLen(SENSEAIR_UART_PORT) > 0) {
+    while (Hal_UART_RxBufLen(SENSEAIR_UART_PORT)) {
         HalUARTRead(SENSEAIR_UART_PORT, (uint8 *)&response, SENSEAIR_RESPONSE_LENGTH);
     }
     HalUARTWrite(SENSEAIR_UART_PORT, readCO2, sizeof(readCO2) / sizeof(readCO2[0]));
@@ -52,6 +53,7 @@ uint16 zclApp_SenseAirRead(void) {
 
     if (response[0] != 0xFE || response[1] != 0x04) {
         LREPMaster("Invalid response\r\n");
+        HalLedSet(HAL_LED_ALL, HAL_LED_MODE_FLASH);
         return 0;
     }
 
