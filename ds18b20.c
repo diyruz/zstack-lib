@@ -31,7 +31,7 @@ static uint8 ds18b20_read(void);
 static void ds18b20_send_byte(int8);
 static uint8 ds18b20_read_byte(void);
 static uint8 ds18b20_Reset(void);
-static void ds18b20_setResolution(uint8_t resolution);
+static void ds18b20_setResolution(uint8 resolution);
 static int16 ds18b20_convertTemperature(uint8 temp1, uint8 temp2, uint8 resolution);
 
 static void _delay_us(uint16 microSecs) {
@@ -114,7 +114,7 @@ static uint8 ds18b20_Reset(void) {
     return i;
 }
 
-static void ds18b20_setResolution(uint8_t resolution) {
+static void ds18b20_setResolution(uint8 resolution) {
     ds18b20_Reset();
     ds18b20_send_byte(DS18B20_SKIP_ROM);
     ds18b20_send_byte(DS18B20_WRITE_SCRATCHPAD);
