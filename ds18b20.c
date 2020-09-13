@@ -31,6 +31,7 @@ static uint8 ds18b20_read(void);
 static void ds18b20_send_byte(int8);
 static uint8 ds18b20_read_byte(void);
 static uint8 ds18b20_Reset(void);
+static void ds18b20_GroudPins(void);
 static void ds18b20_setResolution(uint8 resolution);
 static int16 ds18b20_convertTemperature(uint8 temp1, uint8 temp2, uint8 resolution);
 
@@ -114,6 +115,11 @@ static uint8 ds18b20_Reset(void) {
     return i;
 }
 
+static void ds18b20_GroudPins(void) {
+    // TSENS_SBIT = 0;
+    TSENS_DIR &= ~TSENS_BV; // input
+}
+
 static void ds18b20_setResolution(uint8 resolution) {
     ds18b20_Reset();
     ds18b20_send_byte(DS18B20_SKIP_ROM);
@@ -179,6 +185,7 @@ int16 readTemperature(void) {
 
         if (temp1 == 0xff && temp2 == 0xff) {
             // No sensor found.
+            ds18b20_GroudPins();
             return 1;
         }
         if (temp1 == 0x50 && temp2 == 0x05) {
@@ -186,7 +193,11 @@ int16 readTemperature(void) {
             retry_count--;
             continue;
         }
+
+        ds18b20_GroudPins();
         return ds18b20_convertTemperature(temp1, temp2, DS18B20_RESOLUTION);
     }
+
+    ds18b20_GroudPins();
     return 1;
 }
