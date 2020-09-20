@@ -143,10 +143,12 @@ void HalKeyConfig(bool interruptEnable, halKeyCBack_t cback) {
     P1INP &= ~HAL_KEY_P1_INPUT_PINS; //Pullup/pulldown 
 #if (HAL_KEY_P1_INPUT_PINS_EDGE == HAL_KEY_FALLING_EDGE)
     P2INP &= ~HAL_KEY_BIT6;        // pull up
+    MicroWait(50);
     PICTL |= HAL_KEY_P1_EDGE_BITS; // set falling edge on port
 #else
-    PICTL &= ~HAL_KEY_P1_EDGE_BITS;
     P2INP |= HAL_KEY_BIT6; // pull down
+    MicroWait(50);
+    PICTL &= ~HAL_KEY_P1_EDGE_BITS;
 #endif
 
 #endif
@@ -157,10 +159,12 @@ void HalKeyConfig(bool interruptEnable, halKeyCBack_t cback) {
     P2INP &= ~HAL_KEY_P2_INPUT_PINS; //Pullup/pulldown
 #if (HAL_KEY_P2_INPUT_PINS_EDGE == HAL_KEY_FALLING_EDGE)
     P2INP &= ~HAL_KEY_BIT7;        // pull up
+    MicroWait(50);
     PICTL |= HAL_KEY_P2_EDGE_BITS; // set falling edge on port
 #else
-    PICTL &= ~HAL_KEY_P2_EDGE_BITS;
     P2INP |= HAL_KEY_BIT7; // pull down
+    MicroWait(50);
+    PICTL &= ~HAL_KEY_P2_EDGE_BITS;
 #endif
 
 #endif
