@@ -20,7 +20,9 @@ void zclCommissioning_Init(uint8 task_id) {
 
     bdb_RegisterCommissioningStatusCB(zclCommissioning_ProcessCommissioningStatus);
     bdb_RegisterBindNotificationCB(zclCommissioning_BindNotification);
-
+    #ifdef APP_TX_POWER
+        ZMacSetTransmitPower(APP_TX_POWER);
+    #endif
     bdb_StartCommissioning(BDB_COMMISSIONING_MODE_NWK_STEERING | BDB_COMMISSIONING_MODE_FINDING_BINDING);
 }
 
