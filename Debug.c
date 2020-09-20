@@ -15,10 +15,8 @@ void vprint(const char *fmt, va_list argp) {
 
 #ifdef DO_DEBUG_UART
 #define UART_PORT HAL_UART_PORT_0
-halUARTCfg_t halUARTConfig;
-static void HalUARTCback(uint8 port, uint8 event) {}
-
 bool DebugInit() {
+    halUARTCfg_t halUARTConfig;
     halUARTConfig.configured = TRUE;
     halUARTConfig.baudRate = HAL_UART_BR_115200;
     halUARTConfig.flowControl = FALSE;
@@ -26,9 +24,8 @@ bool DebugInit() {
                                              // reaches maxRxBufSize
     halUARTConfig.idleTimeout = 10;          // this parameter indicates rx timeout period in millisecond
     halUARTConfig.rx.maxBufSize = 0;
-    halUARTConfig.tx.maxBufSize = BUFFLEN >> 1;
+    halUARTConfig.tx.maxBufSize = BUFFLEN;
     halUARTConfig.intEnable = TRUE;
-    halUARTConfig.callBackFunc = HalUARTCback;
     HalUARTInit();
     if (HalUARTOpen(UART_PORT, &halUARTConfig) == HAL_UART_SUCCESS) {
         LREPMaster("Initialized debug module \r\n");
@@ -41,7 +38,6 @@ void LREPMaster(uint8 *data) {
     if (data == NULL) {
         return;
     }
-
     HalUARTWrite(UART_PORT, data, osal_strlen((char *)data));
 }
 
