@@ -68,6 +68,13 @@ void LREP(char *format, ...) {
 void LREPMaster(uint8 *data) { debug_str(data); }
 #else
 bool DebugInit() {return true;};
-void LREP(char *format, ...) {};
-void LREPMaster(uint8 *data) {};
+void LREP(char *format, ...) {
+    va_list argp;
+    va_start(argp, format);
+    printf(format, argp);
+    va_end(argp);
+};
+void LREPMaster(uint8 *data) {
+    printf(data);
+};
 #endif
