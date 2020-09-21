@@ -16,7 +16,6 @@ uint8 disableABC[] = {0xFE, 0x06, 0x00, 0x1F, 0x00, 0x00, 0xAC, 0x03};
 uint8 enableABC[] =  {0xFE, 0x60, 0x00, 0x1F, 0x00, 0xB4, 0xAC, 0x74};
 
 static void flushUart(void);
-static uint16 senseair_checksum(uint8 *ptr, uint8 length);
 
 static void flushUart(void) {
     uint8 response;
@@ -66,14 +65,6 @@ uint16 zclApp_SenseAirRead(void) {
         return 0;
     }
 
-    uint16 calc_checksum = senseair_checksum(response, 11);
-    uint16 resp_checksum = (((uint16)response[12]) << 8) | response[11];
-    if (resp_checksum != calc_checksum) {
-        LREPMaster("Wrong checksum\r\n");
-        HalLedSet(HAL_LED_ALL, HAL_LED_MODE_FLASH);
-        return 0;
-    }
-
     const uint8 length = response[2];
     const uint16 status = (((uint16)response[3]) << 8) | response[4];
     const uint16 ppm = (((uint16)response[length + 1]) << 8) | response[length + 2];
@@ -81,22 +72,4 @@ uint16 zclApp_SenseAirRead(void) {
     LREP("SenseAir Received CO₂=%d ppm Status=0x%X\r\n", ppm, status);
 
     return ppm;
-}
-
-
-static uint16 senseair_checksum(uint8 *ptr, uint8 length) {
-  uint16 crc = 0xFFFF;
-  uint8 i;
-  while (length--) {
-    crc ^= *ptr++;
-    for (i = 0; i < 8; i++) {
-      if ((crc & 0x01) != 0) {
-        crc >>= 1;
-        crc ^= 0xA001;
-      } else {
-        crc >>= 1;
-      }
-    }
-  }
-  return crc;
 }
