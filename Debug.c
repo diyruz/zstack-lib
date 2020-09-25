@@ -26,6 +26,7 @@ bool DebugInit() {
     halUARTConfig.rx.maxBufSize = 0;
     halUARTConfig.tx.maxBufSize = BUFFLEN;
     halUARTConfig.intEnable = TRUE;
+    halUARTConfig.callBackFunc = NULL;
     HalUARTInit();
     if (HalUARTOpen(UART_PORT, &halUARTConfig) == HAL_UART_SUCCESS) {
         LREPMaster("Initialized debug module \r\n");

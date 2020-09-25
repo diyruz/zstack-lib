@@ -15,17 +15,7 @@ uint8 readCO2[] =    {0xFE, 0x04, 0x00, 0x00, 0x00, 0x04, 0xE5, 0xC6};
 uint8 disableABC[] = {0xFE, 0x06, 0x00, 0x1F, 0x00, 0x00, 0xAC, 0x03};
 uint8 enableABC[] =  {0xFE, 0x60, 0x00, 0x1F, 0x00, 0xB4, 0xAC, 0x74};
 
-static void flushUart(void);
-
-static void flushUart(void) {
-    uint8 response;
-    while (Hal_UART_RxBufLen(SENSEAIR_UART_PORT)) {
-        HalUARTRead(SENSEAIR_UART_PORT, &response, 1);
-    }
-}
-
 void zclApp_SenseAirSetABC(bool isDisable) {
-    flushUart();
     if (isDisable) {
         HalUARTWrite(SENSEAIR_UART_PORT, disableABC, sizeof(disableABC) / sizeof(disableABC[0]));
     } else {
@@ -44,14 +34,13 @@ void zclApp_SenseAirInit(void) {
     halUARTConfig.rx.maxBufSize = SENSEAIR_RESPONSE_LENGTH;
     halUARTConfig.tx.maxBufSize = SENSEAIR_RESPONSE_LENGTH;
     halUARTConfig.intEnable = TRUE;
+    halUARTConfig.callBackFunc = NULL;
     HalUARTInit();
     if (HalUARTOpen(SENSEAIR_UART_PORT, &halUARTConfig) == HAL_UART_SUCCESS) {
         LREPMaster("Initialized sensair \r\n");
     }
-    flushUart();
 }
 void zclApp_SenseAirRequestMeasure(void) {
-    flushUart();
     HalUARTWrite(SENSEAIR_UART_PORT, readCO2, sizeof(readCO2) / sizeof(readCO2[0]));
 }
 uint16 zclApp_SenseAirRead(void) {
