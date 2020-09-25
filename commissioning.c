@@ -9,6 +9,7 @@
 static void zclCommissioning_ProcessCommissioningStatus(bdbCommissioningModeMsg_t *bdbCommissioningModeMsg);
 static void zclCommissioning_ResetBackoffRetry(void);
 static void zclCommissioning_BindNotification(bdbBindNotificationData_t *data);
+extern bool requestNewTrustCenterLinkKey;
 
 byte rejoinsLeft = APP_COMMISSIONING_END_DEVICE_REJOIN_TRIES;
 uint32 rejoinDelay = APP_COMMISSIONING_END_DEVICE_REJOIN_START_DELAY;
@@ -23,6 +24,9 @@ void zclCommissioning_Init(uint8 task_id) {
     #ifdef APP_TX_POWER
         ZMacSetTransmitPower(APP_TX_POWER);
     #endif
+    // this is important to allow connects throught routers
+    // to make this work, coordinator should be compiled with this flag #define TP2_LEGACY_ZC
+    requestNewTrustCenterLinkKey = FALSE;
     bdb_StartCommissioning(BDB_COMMISSIONING_MODE_NWK_STEERING | BDB_COMMISSIONING_MODE_FINDING_BINDING);
 }
 
@@ -106,16 +110,9 @@ void zclCommissioning_Sleep(uint8 allow) {
     LREP("zclCommissioning_Sleep %d\r\n", allow);
 #if defined(POWER_SAVING)
     if (allow) {
-        osal_pwrmgr_task_state(NWK_TaskID, PWRMGR_CONSERVE);
         NLME_SetPollRate(0);
-        bool RxOnIdle = FALSE;
-        ZMacSetReq(ZMacRxOnIdle, &RxOnIdle);
     } else {
-        osal_pwrmgr_task_state(NWK_TaskID, PWRMGR_HOLD);
-        // 1 will do a one time poll.
-        NLME_SetPollRate(1);
-        bool RxOnIdle = TRUE;
-        ZMacSetReq(ZMacRxOnIdle, &RxOnIdle);
+        NLME_SetPollRate(POLL_RATE);
     }
 #endif
 }
