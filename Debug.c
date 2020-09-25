@@ -72,6 +72,6 @@ void LREP(char *format, ...) {
     va_end(argp);
 };
 void LREPMaster(uint8 *data) {
-    printf(data);
+    printf((const char*)data);
 };
 #endif
