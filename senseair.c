@@ -15,11 +15,11 @@ uint8 readCO2[] =    {0xFE, 0x04, 0x00, 0x00, 0x00, 0x04, 0xE5, 0xC6};
 uint8 disableABC[] = {0xFE, 0x06, 0x00, 0x1F, 0x00, 0x00, 0xAC, 0x03};
 uint8 enableABC[] =  {0xFE, 0x60, 0x00, 0x1F, 0x00, 0xB4, 0xAC, 0x74};
 
-void zclApp_SenseAirSetABC(bool isDisable) {
-    if (isDisable) {
-        HalUARTWrite(SENSEAIR_UART_PORT, disableABC, sizeof(disableABC) / sizeof(disableABC[0]));
-    } else {
+void zclApp_SenseAirSetABC(bool isEnabled) {
+    if (isEnabled) {
         HalUARTWrite(SENSEAIR_UART_PORT, enableABC, sizeof(enableABC) / sizeof(enableABC[0]));
+    } else {
+        HalUARTWrite(SENSEAIR_UART_PORT, disableABC, sizeof(disableABC) / sizeof(disableABC[0]));
     }
 }
 
