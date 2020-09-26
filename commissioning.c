@@ -16,14 +16,18 @@ uint32 rejoinDelay = APP_COMMISSIONING_END_DEVICE_REJOIN_START_DELAY;
 
 uint8 zclCommissioning_TaskId = 0;
 
+#ifndef APP_TX_POWER
+    #define APP_TX_POWER TX_PWR_PLUS_4
+#endif
+
 void zclCommissioning_Init(uint8 task_id) {
     zclCommissioning_TaskId = task_id;
 
     bdb_RegisterCommissioningStatusCB(zclCommissioning_ProcessCommissioningStatus);
     bdb_RegisterBindNotificationCB(zclCommissioning_BindNotification);
-    #ifdef APP_TX_POWER
-        ZMacSetTransmitPower(APP_TX_POWER);
-    #endif
+
+    ZMacSetTransmitPower(APP_TX_POWER);
+
     // this is important to allow connects throught routers
     // to make this work, coordinator should be compiled with this flag #define TP2_LEGACY_ZC
     requestNewTrustCenterLinkKey = FALSE;
