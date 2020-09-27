@@ -23,23 +23,6 @@ void zclApp_SenseAirSetABC(bool isEnabled) {
     }
 }
 
-void zclApp_SenseAirInit(void) {
-    halUARTCfg_t halUARTConfig;
-    halUARTConfig.configured = TRUE;
-    halUARTConfig.baudRate = HAL_UART_BR_9600;
-    halUARTConfig.flowControl = FALSE;
-    halUARTConfig.flowControlThreshold = 48; // this parameter indicates number of bytes left before Rx Buffer
-                                             // reaches maxRxBufSize
-    halUARTConfig.idleTimeout = 10;          // this parameter indicates rx timeout period in millisecond
-    halUARTConfig.rx.maxBufSize = SENSEAIR_RESPONSE_LENGTH;
-    halUARTConfig.tx.maxBufSize = SENSEAIR_RESPONSE_LENGTH;
-    halUARTConfig.intEnable = TRUE;
-    halUARTConfig.callBackFunc = NULL;
-    HalUARTInit();
-    if (HalUARTOpen(SENSEAIR_UART_PORT, &halUARTConfig) == HAL_UART_SUCCESS) {
-        LREPMaster("Initialized sensair \r\n");
-    }
-}
 void zclApp_SenseAirRequestMeasure(void) {
     HalUARTWrite(SENSEAIR_UART_PORT, readCO2, sizeof(readCO2) / sizeof(readCO2[0]));
 }
