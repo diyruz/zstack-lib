@@ -105,9 +105,9 @@ static void zclCommissioning_ProcessCommissioningStatus(bdbCommissioningModeMsg_
 }
 
 static void zclCommissioning_ProcessIncomingMsg(zclIncomingMsg_t *pInMsg) {
-    HalLedSet(HAL_LED_1, HAL_LED_MODE_BLINK);
-    if (pInMsg->attrCmd)
+    if (pInMsg->attrCmd) {
         osal_mem_free(pInMsg->attrCmd);
+    }
 }
 
 void zclCommissioning_Sleep(uint8 allow) {
