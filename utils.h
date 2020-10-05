@@ -6,6 +6,13 @@ extern uint16 adcReadSampled(uint8 channel, uint8 resolution, uint8 reference, u
 
 
 #undef P
+#undef INP
+#define INP INP
+#undef DIR
+#define DIR DIR
+#undef SEL
+#define SEL SEL
+
 // General I/O definitions
 #define IO_GIO 0 // General purpose I/O
 #define IO_PER 1 // Peripheral function
