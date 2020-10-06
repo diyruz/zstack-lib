@@ -15,23 +15,8 @@ uint8 MHZ19_RESPONSE_LENGTH = 9;
 uint8 MHZ19_COMMAND_GET_PPM[] = {0xFF, 0x01, 0x86, 0x00, 0x00, 0x00, 0x00, 0x00, 0x79};
 uint8 MHZ19_COMMAND_ABC_ENABLE[] = {0xFF, 0x01, 0x79, 0xA0, 0x00, 0x00, 0x00, 0x00, 0xE6};
 uint8 MHZ19_COMMAND_ABC_DISABLE[] = {0xFF, 0x01, 0x79, 0x00, 0x00, 0x00, 0x00, 0x00, 0x86};
-static uint8 MHZ19_COMMAND_SET_RANGE_5000PPM[] = {0xFF, 0x01, 0x99, 0x00, 0x00, 0x00, 0x13, 0x88, 0xCB};
-
-static void flushUART(void);
-
-static void flushUART(void) {
-    uint8 response;
-    while (Hal_UART_RxBufLen(CO2_UART_PORT) > 0) {
-        HalUARTRead(CO2_UART_PORT, (uint8 *)&response, 1);
-    }
-}
-void MHZ19_SetRange5000PPM(void) {
-    flushUART();
-    HalUARTWrite(CO2_UART_PORT, MHZ19_COMMAND_SET_RANGE_5000PPM, sizeof(MHZ19_COMMAND_SET_RANGE_5000PPM) / sizeof(MHZ19_COMMAND_SET_RANGE_5000PPM[0]));
-}
 
 void MHZ19_SetABC(bool isEnabled) {
-    flushUART();
     if (isEnabled) {
         HalUARTWrite(CO2_UART_PORT, MHZ19_COMMAND_ABC_ENABLE, sizeof(MHZ19_COMMAND_ABC_ENABLE) / sizeof(MHZ19_COMMAND_ABC_ENABLE[0]));
     } else {
@@ -39,10 +24,7 @@ void MHZ19_SetABC(bool isEnabled) {
     }
 }
 
-void MHZ19_RequestMeasure(void) {
-    flushUART();
-    HalUARTWrite(CO2_UART_PORT, MHZ19_COMMAND_GET_PPM, sizeof(MHZ19_COMMAND_GET_PPM) / sizeof(MHZ19_COMMAND_GET_PPM[0]));
-}
+void MHZ19_RequestMeasure(void) { HalUARTWrite(CO2_UART_PORT, MHZ19_COMMAND_GET_PPM, sizeof(MHZ19_COMMAND_GET_PPM) / sizeof(MHZ19_COMMAND_GET_PPM[0])); }
 uint16 MHZ19_Read(void) {
 
     uint8 response[MHZ18_RESPONSE_LENGTH];

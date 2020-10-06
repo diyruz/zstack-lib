@@ -2,18 +2,19 @@
 #include "Debug.h"
 #include "OSAL.h"
 #include "OnBoard.h"
-#include "hal_uart.h"
 #include "hal_led.h"
+#include "hal_uart.h"
+
 
 #ifndef CO2_UART_PORT
-    #define CO2_UART_PORT HAL_UART_PORT_1
+#define CO2_UART_PORT HAL_UART_PORT_1
 #endif
 
 #define SENSEAIR_RESPONSE_LENGTH 13
 
-uint8 readCO2[] =    {0xFE, 0x04, 0x00, 0x00, 0x00, 0x04, 0xE5, 0xC6};
+uint8 readCO2[] = {0xFE, 0x04, 0x00, 0x00, 0x00, 0x04, 0xE5, 0xC6};
 uint8 disableABC[] = {0xFE, 0x06, 0x00, 0x1F, 0x00, 0x00, 0xAC, 0x03};
-uint8 enableABC[] =  {0xFE, 0x60, 0x00, 0x1F, 0x00, 0xB4, 0xAC, 0x74};
+uint8 enableABC[] = {0xFE, 0x60, 0x00, 0x1F, 0x00, 0xB4, 0xAC, 0x74};
 
 void SenseAir_SetABC(bool isEnabled) {
     if (isEnabled) {
@@ -23,9 +24,7 @@ void SenseAir_SetABC(bool isEnabled) {
     }
 }
 
-void SenseAir_RequestMeasure(void) {
-    HalUARTWrite(CO2_UART_PORT, readCO2, sizeof(readCO2) / sizeof(readCO2[0]));
-}
+void SenseAir_RequestMeasure(void) { HalUARTWrite(CO2_UART_PORT, readCO2, sizeof(readCO2) / sizeof(readCO2[0])); }
 uint16 SenseAir_Read(void) {
 
     uint8 response[SENSEAIR_RESPONSE_LENGTH];
@@ -33,7 +32,6 @@ uint16 SenseAir_Read(void) {
 
     if (response[0] != 0xFE || response[1] != 0x04) {
         LREPMaster("Invalid response\r\n");
-        HalLedSet(HAL_LED_ALL, HAL_LED_MODE_FLASH);
         return 0;
     }
 
