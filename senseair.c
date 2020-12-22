@@ -35,6 +35,7 @@ void SenseAir_Read(uint16 *ppm) {
     if (response[0] != 0xFE || response[1] != 0x04) {
         LREPMaster("Invalid response\r\n");
         *ppm = SENSEAIR_INVALID_RESPONSE;
+        return;
     }
 
     const uint8 length = response[2];

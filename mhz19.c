@@ -36,6 +36,7 @@ void MHZ19_Read(uint16 *ppm) {
         LREPMaster("MHZ18 Invalid response\r\n");
         HalLedSet(HAL_LED_ALL, HAL_LED_MODE_FLASH);
         *ppm = MHZ18_INVALID_RESPONSE;
+        return;
     }
 
     *ppm = (((uint16)response[2]) << 8) | response[3];
