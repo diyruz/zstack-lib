@@ -35,9 +35,9 @@ void MHZ19_Read(uint16 *ppm) {
     if (response[0] != 0xFF || response[1] != 0x86) {
         LREPMaster("MHZ18 Invalid response\r\n");
         HalLedSet(HAL_LED_ALL, HAL_LED_MODE_FLASH);
-        ppm = -1;
+        *ppm = MHZ18_INVALID_RESPONSE;
     }
 
-    ppm = (((uint16)response[2]) << 8) | response[3];
+    *ppm = (((uint16)response[2]) << 8) | response[3];
     LREP("MHZ18 Received CO₂=%d ppm\r\n", ppm);
 }

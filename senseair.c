@@ -34,12 +34,12 @@ void SenseAir_Read(uint16 *ppm) {
 
     if (response[0] != 0xFE || response[1] != 0x04) {
         LREPMaster("Invalid response\r\n");
-        ppm = -1;
+        *ppm = SENSEAIR_INVALID_RESPONSE;
     }
 
     const uint8 length = response[2];
     const uint16 status = (((uint16)response[3]) << 8) | response[4];
-    ppm = (((uint16)response[length + 1]) << 8) | response[length + 2];
+    *ppm = (((uint16)response[length + 1]) << 8) | response[length + 2];
 
     LREP("SenseAir Received CO₂=%d ppm Status=0x%X\r\n", ppm, status);
 }
