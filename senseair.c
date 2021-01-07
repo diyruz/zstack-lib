@@ -5,10 +5,15 @@
 #include "hal_led.h"
 #include "hal_uart.h"
 
-
 #ifndef CO2_UART_PORT
 #define CO2_UART_PORT HAL_UART_PORT_1
 #endif
+
+static void SenseAir_RequestMeasure(void);
+static uint16 SenseAir_Read(void);
+static void SenseAir_SetABC(bool isEnabled);
+
+extern zclAirSensor_t sense_air_dev = {&SenseAir_RequestMeasure, &SenseAir_Read, &SenseAir_SetABC};
 
 #define SENSEAIR_RESPONSE_LENGTH 13
 
@@ -28,19 +33,19 @@ void SenseAir_RequestMeasure(void) {
     HalUARTWrite(CO2_UART_PORT, readCO2, sizeof(readCO2) / sizeof(readCO2[0])); 
 }
 
-void SenseAir_Read(uint16 *ppm) {
+uint16 SenseAir_Read(void) {
     uint8 response[SENSEAIR_RESPONSE_LENGTH];
     HalUARTRead(CO2_UART_PORT, (uint8 *)&response, sizeof(response) / sizeof(response[0]));
 
     if (response[0] != 0xFE || response[1] != 0x04) {
         LREPMaster("Invalid response\r\n");
-        *ppm = SENSEAIR_INVALID_RESPONSE;
-        return;
+        return AIR_QUALITY_INVALID_RESPONSE;
     }
 
     const uint8 length = response[2];
     const uint16 status = (((uint16)response[3]) << 8) | response[4];
-    *ppm = (((uint16)response[length + 1]) << 8) | response[length + 2];
+    const uint16 ppm = (((uint16)response[length + 1]) << 8) | response[length + 2];
 
     LREP("SenseAir Received CO₂=%d ppm Status=0x%X\r\n", ppm, status);
+    return ppm;
 }
