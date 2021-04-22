@@ -36,7 +36,17 @@ static void ds18b20_setResolution(uint8 resolution);
 static int16 ds18b20_convertTemperature(uint8 temp1, uint8 temp2, uint8 resolution);
 
 static void _delay_us(uint16 microSecs) {
-    MicroWait(microSecs);
+    while (microSecs--)
+    {
+        asm("NOP");
+        asm("NOP");
+        asm("NOP");
+        asm("NOP");
+        asm("NOP");
+        asm("NOP");
+        asm("NOP");
+        asm("NOP");
+    }
 }
 
 static void _delay_ms(uint16 milliSecs) {
@@ -102,16 +112,16 @@ static uint8 ds18b20_read_byte(void) {
 
 // Sends reset pulse
 static uint8 ds18b20_Reset(void) {
-    TSENS_SBIT = 0;
     TSENS_DIR |= TSENS_BV; // output
-    _delay_us(600);
+    TSENS_SBIT = 0;
+    _delay_us(500);
     TSENS_DIR &= ~TSENS_BV; // input
     _delay_us(70);
     uint8 i = TSENS_SBIT;
     _delay_us(200);
     TSENS_SBIT = 1;
     TSENS_DIR |= TSENS_BV; // output
-    _delay_us(600);
+    _delay_us(500);
     return i;
 }
 
