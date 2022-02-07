@@ -40,7 +40,7 @@ uint16 MHZ19_Read(void) {
 
     if (response[0] != 0xFF || response[1] != 0x86) {
         LREPMaster("MHZ18 Invalid response\r\n");
-        HalLedSet(HAL_LED_ALL, HAL_LED_MODE_FLASH);
+        //HalLedSet(HAL_LED_ALL, HAL_LED_MODE_FLASH);
         return AIR_QUALITY_INVALID_RESPONSE;
     }
 
