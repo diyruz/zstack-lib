@@ -6,7 +6,7 @@
 #include "hal_uart.h"
 
 #ifndef CO2_UART_PORT
-#define CO2_UART_PORT HAL_UART_PORT_1
+#define CO2_UART_PORT HAL_UART_PORT_0
 #endif
 
 #define MHZ18_RESPONSE_LENGTH 13
@@ -35,8 +35,6 @@ void MHZ19_RequestMeasure(void) {
 }
 
 uint16 MHZ19_Read(uint8 *response) {
-    
-    HalUARTRead(CO2_UART_PORT, (uint8 *)&response, sizeof(response) / sizeof(response[0]));
 
     if (response[0] != 0xFF || response[1] != 0x86) {
         LREPMaster("MHZ18 Invalid response\r\n");
@@ -44,6 +42,6 @@ uint16 MHZ19_Read(uint8 *response) {
     }
 
     const uint16 ppm = (((uint16)response[2]) << 8) | response[3];
-    LREP("MHZ18 Received CO₂=%d ppm\r\n", ppm);
+    //LREP("MHZ18 Received CO₂=%d ppm\r\n", ppm);
     return ppm;
 }
