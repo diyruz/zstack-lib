@@ -36,16 +36,27 @@ void SenseAir_RequestMeasure(void) {
 uint16 SenseAir_Read(uint8 *response) {
     
     LREPMaster("Read startet \r\n");
-
+ 
+    uint8 is_equal = 1;
+    for (uint8 i=0; i<5; ++i) {
+      if (response[i] != enableABC[i]) {
+          is_equal = 0;
+          break;
+        }
+    }
+    
+    if (is_equal)
+      return AIR_QUALITY_ABC_RESPONSE;
+       
     if (response[0] != 0xFE || response[1] != 0x04) {
         LREPMaster("Invalid response\r\n");
         return AIR_QUALITY_INVALID_RESPONSE;
     }
 
     const uint8 length = response[2];
-    const uint16 status = (((uint16)response[3]) << 8) | response[4];
-    const uint16 ppm = (((uint16)response[length + 1]) << 8) | response[length + 2];
-
-    LREP("SenseAir Received CO₂=%d ppm Status=0x%X\r\n", ppm, status);
+    //const uint16 status = (((uint16)response[3]) << 8) | response[4];
+    uint16 ppm = (((uint16)response[length + 1]) << 8) | response[length + 2];
+    //LREP("SenseAir Received CO2=%d ppm Status=0x%X\r\n", ppm, status);
+    //printf("SenseAir Received CO2=%d ppm Status=0x%X\r\n", ppm, status);
     return ppm;
 }

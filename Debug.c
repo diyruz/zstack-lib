@@ -15,7 +15,7 @@ void vprint(const char *fmt, va_list argp) {
 
 #ifdef DO_DEBUG_UART
 #ifndef DEBUG_UART_PORT
-#define DEBUG_UART_PORT HAL_UART_PORT_0
+#define DEBUG_UART_PORT HAL_UART_PORT_1
 #endif
 bool DebugInit() {
     halUARTCfg_t halUARTConfig;
