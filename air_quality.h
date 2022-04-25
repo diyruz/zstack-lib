@@ -4,7 +4,7 @@
 #define AIR_QUALITY_INVALID_RESPONSE 0xFFFF
 
 typedef void (*request_measure_t)(void);
-typedef uint16 (*read_t)(void);
+typedef uint16 (*read_t)(uint8 *);
 typedef void (*set_ABC_t)(bool isEnabled);
 
 typedef struct {

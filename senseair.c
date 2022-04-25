@@ -6,11 +6,11 @@
 #include "hal_uart.h"
 
 #ifndef CO2_UART_PORT
-#define CO2_UART_PORT HAL_UART_PORT_1
+#define CO2_UART_PORT HAL_UART_PORT_0
 #endif
 
 static void SenseAir_RequestMeasure(void);
-static uint16 SenseAir_Read(void);
+static uint16 SenseAir_Read(uint8 *);
 static void SenseAir_SetABC(bool isEnabled);
 
 extern zclAirSensor_t sense_air_dev = {&SenseAir_RequestMeasure, &SenseAir_Read, &SenseAir_SetABC};
@@ -33,9 +33,9 @@ void SenseAir_RequestMeasure(void) {
     HalUARTWrite(CO2_UART_PORT, readCO2, sizeof(readCO2) / sizeof(readCO2[0])); 
 }
 
-uint16 SenseAir_Read(void) {
-    uint8 response[SENSEAIR_RESPONSE_LENGTH];
-    HalUARTRead(CO2_UART_PORT, (uint8 *)&response, sizeof(response) / sizeof(response[0]));
+uint16 SenseAir_Read(uint8 *response) {
+    
+    LREPMaster("Read startet \r\n");
 
     if (response[0] != 0xFE || response[1] != 0x04) {
         LREPMaster("Invalid response\r\n");

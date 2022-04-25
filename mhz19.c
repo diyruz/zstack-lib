@@ -13,7 +13,7 @@
 
 static void MHZ19_SetABC(bool isEnabled);
 static void MHZ19_RequestMeasure(void);
-static uint16 MHZ19_Read(void);
+static uint16 MHZ19_Read(uint8 *response);
 
 zclAirSensor_t MHZ19_dev = {&MHZ19_RequestMeasure, &MHZ19_Read, &MHZ19_SetABC};
 
@@ -34,8 +34,8 @@ void MHZ19_RequestMeasure(void) {
     HalUARTWrite(CO2_UART_PORT, MHZ19_COMMAND_GET_PPM, sizeof(MHZ19_COMMAND_GET_PPM) / sizeof(MHZ19_COMMAND_GET_PPM[0]));
 }
 
-uint16 MHZ19_Read(void) {
-    uint8 response[MHZ18_RESPONSE_LENGTH];
+uint16 MHZ19_Read(uint8 *response) {
+    
     HalUARTRead(CO2_UART_PORT, (uint8 *)&response, sizeof(response) / sizeof(response[0]));
 
     if (response[0] != 0xFF || response[1] != 0x86) {

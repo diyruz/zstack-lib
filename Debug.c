@@ -14,8 +14,8 @@ void vprint(const char *fmt, va_list argp) {
 }
 
 #ifdef DO_DEBUG_UART
-#ifndef UART_PORT
-#define UART_PORT HAL_UART_PORT_0
+#ifndef DEBUG_UART_PORT
+#define DEBUG_UART_PORT HAL_UART_PORT_0
 #endif
 bool DebugInit() {
     halUARTCfg_t halUARTConfig;
@@ -30,7 +30,7 @@ bool DebugInit() {
     halUARTConfig.intEnable = TRUE;
     halUARTConfig.callBackFunc = NULL;
     HalUARTInit();
-    if (HalUARTOpen(UART_PORT, &halUARTConfig) == HAL_UART_SUCCESS) {
+    if (HalUARTOpen(DEBUG_UART_PORT, &halUARTConfig) == HAL_UART_SUCCESS) {
         LREPMaster("Initialized debug module \r\n");
         return true;
     }
@@ -41,7 +41,7 @@ void LREPMaster(uint8 *data) {
     if (data == NULL) {
         return;
     }
-    HalUARTWrite(UART_PORT, data, osal_strlen((char *)data));
+    HalUARTWrite(DEBUG_UART_PORT, data, osal_strlen((char *)data));
 }
 
 void LREP(char *format, ...) {
